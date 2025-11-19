@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>EchoVision</title>
+
+<!-- Tailwind & Leaflet -->
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+
+<!-- ✅ External CSS -->
+<link rel="stylesheet" href="style.css">
+</head>
+<body class="flex flex-col min-h-screen">
+
+<!-- ===== NAVBAR ===== -->
+<nav class="bg-blue-600 text-white flex items-center justify-between px-4 py-3 shadow-md">
+  <div class="text-xl font-bold">EchoVision</div>
+  <button id="menuBtn" class="focus:outline-none">
+    <svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
+    </svg>
+  </button>
+</nav>
+
+<!-- ===== SLIDE MENU ===== -->
+<div id="sideMenu"
+     class="fixed top-0 right-0 w-64 h-full bg-blue-700 text-white transform translate-x-full menu-slide z-50">
+  <div class="p-4 text-xl font-semibold border-b border-blue-500">Menu</div>
+  <ul class="p-4 space-y-4 text-lg">
+    <li><a href="#" data-sec="home" class="menu-link hover:underline">Home</a></li>
+    <li><a href="#" data-sec="object" class="menu-link hover:underline">Object Detection</a></li>
+    <li><a href="#" data-sec="route" class="menu-link hover:underline">Route Navigation</a></li>
+    <li><a href="#" data-sec="sos" class="menu-link hover:underline">SOS</a></li>
+    <li><a href="#" data-sec="help" class="menu-link hover:underline">Help</a></li>
+  </ul>
+</div>
+
+<!-- ===== MAIN CONTENT ===== -->
+<main class="flex-1 px-4 py-6">
+  <!-- ✅ Your Home, Object Detection, Route Navigation, and SOS Sections remain the same -->
+  <!-- (Copy exactly as in your original file) -->
+<!-- HOME SECTION -->
+  <section id="homeSection" class="space-y-6">
+    <div class="w-full max-w-sm mx-auto bg-white rounded-2xl shadow-md p-6 text-center">
+      <h2 class="text-lg font-bold text-gray-800 mb-3">About EchoVision</h2>
+      <p class="text-gray-600 text-justify">
+        EchoVision helps visually impaired users with <strong>object detection</strong>,
+        <strong>route navigation</strong>, and a quick <strong>SOS emergency feature</strong>.
+      </p>
+    </div>
+
+    <div class="w-full max-w-sm mx-auto bg-white rounded-2xl shadow-md p-6 flex items-center justify-center">
+      <img src="blindnav.png" alt="Blind Navigation">
+    </div>
+
+    <div class="text-center mt-4">
+      <button onclick="startInitialVoiceCommand()" 
+              class="bg-green-600 text-white px-4 py-2 rounded-xl font-bold hover:bg-green-700">
+        🎤 Speak Now
+      </button>
+    </div>
+  </section>
+
+  <!-- OBJECT DETECTION SECTION -->
+ <section id="objectSection" class="hidden p-4 relative">
+  <h2 class="text-xl font-bold mb-2">Object Detection</h2>
+  <div class="relative w-full max-w-md mx-auto">
+    <video id="objCamera" autoplay muted playsinline class="w-full rounded-lg"></video>
+    <canvas id="objCanvas" class="absolute top-0 left-0 rounded-lg"></canvas>
+  </div>
+</section>
+
+  <!-- ROUTE NAVIGATION SECTION -->
+  <section id="routeSection" class="hidden max-w-md mx-auto">
+    <div class="bg-white rounded-2xl shadow-md p-6">
+      <h2 class="text-xl font-bold text-gray-800 mb-4 text-center">Route Navigation</h2>
+      <label class="block mb-2 text-gray-700">Destination</label>
+      <input id="destinationInput" type="text"
+             class="w-full mb-4 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+             placeholder="Enter your destination" />
+      <button id="navigateBtn"
+              class="w-full bg-green-600 text-white py-3 rounded-xl font-bold text-lg hover:bg-green-700">
+        Navigate
+      </button>
+      <div class="route-containers mt-6">
+        <div class="route-box"><div id="map">Map loading...</div></div>
+        <div class="route-box" style="flex-direction:column;">
+          <video id="cameraFront" autoplay playsinline></video>
+          <canvas id="canvasFront"></canvas>
+          <video id="cameraBack" autoplay playsinline></video>
+          <canvas id="canvasBack"></canvas>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SOS SECTION -->
+  <section id="sosSection" class="hidden max-w-md mx-auto">
+    <div class="bg-white rounded-2xl shadow-md p-6">
+      <h2 class="text-xl font-bold text-gray-800 mb-4 text-center">SOS Contacts</h2>
+      <label class="block mb-2 text-gray-700">Name</label>
+      <input id="nameInput" type="text"
+             class="w-full mb-4 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+             placeholder="Enter contact name" />
+      <label class="block mb-2 text-gray-700">Phone Number</label>
+      <input id="numberInput" type="tel"
+             class="w-full mb-4 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+             placeholder="Enter contact number" />
+      <div class="flex justify-between space-x-2 mt-4">
+        <button id="addBtn" class="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700">Add Contact</button>
+        <button id="editBtn" class="flex-1 bg-yellow-500 text-white py-2 rounded-lg hover:bg-yellow-600">Edit</button>
+        <button id="deleteBtn" class="flex-1 bg-red-600 text-white py-2 rounded-lg hover:bg-red-700">Delete</button>
+      </div>
+      <div class="mt-6">
+        <h3 class="text-lg font-semibold text-gray-800 mb-2">Saved Contacts</h3>
+        <ul id="contactList" class="space-y-2 text-gray-700"></ul>
+      </div>
+      <div class="mt-8 text-center">
+        <button id="sosBtn" class="w-full bg-red-600 text-white py-3 rounded-xl font-bold text-lg hover:bg-red-700">🚨 SEND SOS</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="helpSection" class="hidden max-w-md mx-auto">
+  <div class="bg-white rounded-2xl shadow-md p-6">
+    <h2 class="text-xl font-bold text-gray-800 mb-4 text-center">Help & Instructions</h2>
+
+    <div class="mb-4">
+      <h3 class="font-semibold text-gray-700">How to Use:</h3>
+      <ul class="list-disc list-inside text-gray-600">
+        <li>Tap the menu to navigate between sections.</li>
+        <li>Use the Object Detection screen to identify obstacles.</li>
+        <li>Use the Route Navigation to get directions to your destination.</li>
+      </ul>
+    </div>
+
+    <div class="mb-4">
+      <h3 class="font-semibold text-gray-700">Voice Commands:</h3>
+      <ul class="list-disc list-inside text-gray-600">
+        <li>Say a destination name to start navigation.</li>
+        <li>Say “SOS” to send an emergency message to your contacts.</li>
+      </ul>
+    </div>
+
+    <div class="mb-4">
+      <h3 class="font-semibold text-gray-700">SOS Instructions:</h3>
+      <ul class="list-disc list-inside text-gray-600">
+        <li>Add your emergency contacts in the SOS section first.</li>
+        <li>When SOS is activated, your current location will be sent via SMS.</li>
+      </ul>
+    </div>
+
+    <p class="text-sm text-gray-500 text-center">Ensure your microphone and location permissions are enabled for the app to work properly.</p>
+  </div>
+</section>
+
+
+
+
+</main>
+
+<!-- ===== FOOTER ===== -->
+<footer class="bg-blue-600 text-white text-center py-3 text-sm">
+  @EchoVision 2025. All rights reserved.
+</footer>
+
+<!-- ===== External JS Libraries ===== -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.12.0/dist/tf.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd"></script>
+
+<!-- ✅ External JS -->
+<script src="app.js"></script>
+</body>
+</html>

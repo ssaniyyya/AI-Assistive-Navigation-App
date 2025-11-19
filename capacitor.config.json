@@ -1,0 +1,16 @@
+{
+  "appId": "com.example.app",
+  "appName": "EchoVision",
+  "webDir": "www",
+  "bundledWebRuntime": false,
+  "plugins": {
+    "SplashScreen": {
+      "launchAutoHide": true
+    },
+    "TTS": {
+      "language": "en-US",
+      "rate": 1.0,
+      "pitch": 1.0
+    }
+  }
+}
